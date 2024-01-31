@@ -1,6 +1,7 @@
 import React from "react";
 
 import BackgroundImage from '../../assets/background.png';
+import Button from "../../components/Button";
 
 import * as Styles from './styles';
 
@@ -13,6 +14,8 @@ const SignIn: React.FC = () => {
     <Styles.Slogan>
       Gestão de uso de veículos
     </Styles.Slogan>
+
+    <Button title="Entrar com Google" />
   </Styles.Container>;
 };
 
