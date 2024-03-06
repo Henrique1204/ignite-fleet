@@ -2,7 +2,7 @@ import { StatusBar } from "react-native";
 
 import { ThemeProvider } from "styled-components";
 
-import { AppProvider, UserProvider } from "@realm/react";
+import { AppProvider, RealmProvider, UserProvider } from "@realm/react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
@@ -36,7 +36,9 @@ const App = () => {
 
           <Loader loading={!fontsLoaded}>
             <UserProvider fallback={<SignIn />}>
-              <Routes />
+              <RealmProvider>
+                <Routes />
+              </RealmProvider>
             </UserProvider>
           </Loader>
         </SafeAreaProvider>
