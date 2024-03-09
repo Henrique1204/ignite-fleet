@@ -7,7 +7,6 @@ import { useUser, useApp } from "@realm/react";
 
 import { Power } from "phosphor-react-native";
 
-
 import theme from "../../theme";
 
 import * as Styles from "./styles";
