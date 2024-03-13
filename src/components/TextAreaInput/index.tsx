@@ -12,12 +12,14 @@ import * as Styles from "./styles";
 type TextAreaInputProps = TextInputProps & FieldGroupProps;
 
 const TextAreaInput = React.forwardRef<TextInput, TextAreaInputProps>(
-  ({ label, ...inputProps }) => {
+  ({ label, ...inputProps }, ref) => {
     const { COLORS } = useTheme();
 
     return (
       <FieldGroup label={label} height="150px">
         <Styles.TextAreaInput
+          // @ts-ignore - Não aceitando ref.
+          ref={ref}
           multiline
           autoCapitalize="sentences"
           placeholderTextColor={COLORS.GRAY_400}

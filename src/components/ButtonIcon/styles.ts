@@ -1,12 +1,11 @@
 import styled from "styled-components/native";
 
 export const Container = styled.TouchableOpacity`
-  width: 100%;
-  min-height: 56px;
-  max-height: 56px;
+  width: 56px;
+  height: 56px;
   border-radius: 6px;
 
-  background-color: ${({ theme }) => theme.COLORS.BRAND_MID};
+  background-color: ${({ theme }) => theme.COLORS.GRAY_600};
 
   display: flex;
   align-items: center;

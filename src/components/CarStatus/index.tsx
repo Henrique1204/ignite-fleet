@@ -1,6 +1,6 @@
 import React from "react";
 
-import { TouchableOpacityProps } from 'react-native';
+import { TouchableOpacityProps } from "react-native";
 
 import { useTheme } from "styled-components/native";
 
@@ -15,7 +15,7 @@ type CarStatusProps = TouchableOpacityProps & {
 const CarStatus: React.FC<CarStatusProps> = ({ licensePlate, ...props }) => {
   const theme = useTheme();
 
-  const Icon = licensePlate ? Key : Car;
+  const Icon = licensePlate ? Car : Key;
 
   const message = licensePlate
     ? `Veículo ${licensePlate} em use. `
@@ -26,7 +26,7 @@ const CarStatus: React.FC<CarStatusProps> = ({ licensePlate, ...props }) => {
   return (
     <Styles.Container {...props}>
       <Styles.IconBox>
-        <Icon size={32} color={theme.COLORS.BRAND_LIGHT} />
+        <Icon size={52} color={theme.COLORS.BRAND_LIGHT} />
       </Styles.IconBox>
 
       <Styles.Message>
