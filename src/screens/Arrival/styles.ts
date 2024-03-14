@@ -37,6 +37,19 @@ export const Description = styled.Text`
   color: ${({ theme }) => theme.COLORS.GRAY_100};
 `;
 
+export const SyncMessage = styled.Text`
+  margin: 32px;
+
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  text-align: center;
+
+  color: ${({ theme }) => theme.COLORS.GRAY_300};
+
+  flex: 1;
+`;
+
+
 export const Footer = styled.View`
   width: 100%;
   padding: 32px;

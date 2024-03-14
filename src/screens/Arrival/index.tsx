@@ -9,6 +9,7 @@ import { BSON } from "realm";
 
 import { useObject, useRealm } from "../../libs/realm";
 import Historic from "../../libs/realm/schemas/Historic";
+import { getLastSyncTimestamp } from "../../libs/asyncStorage/syncStorage";
 
 import Header from "../../components/Header";
 import Button from "../../components/Button";
@@ -18,6 +19,8 @@ import Show from "../../components/Show";
 import * as Styles from "./styles";
 
 const Arrival: React.FC = () => {
+  const [isNotDataSynced, setIsNotDataSynced] = React.useState<boolean>(false);
+
   const { goBack } = useNavigation();
 
   const { params } = useRoute();
@@ -68,6 +71,14 @@ const Arrival: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    if (historic) {
+      getLastSyncTimestamp().then((lastSync) => {
+        setIsNotDataSynced(historic.updated_at.getTime() > lastSync);
+      });
+    }
+  }, [historic]);
+
   return (
     <Styles.Container>
       <Header title={title} />
@@ -79,6 +90,12 @@ const Arrival: React.FC = () => {
         <Styles.Label>Finalidade</Styles.Label>
         <Styles.Description>{historic?.description}</Styles.Description>
       </Styles.Content>
+
+      <Show isShowing={isNotDataSynced}>
+        <Styles.SyncMessage>
+          Sincronização da {isDepartureStatus ? "partida" : "chegada"} pendente.
+        </Styles.SyncMessage>
+      </Show>
 
       <Show isShowing={isDepartureStatus}>
         <Styles.Footer>
