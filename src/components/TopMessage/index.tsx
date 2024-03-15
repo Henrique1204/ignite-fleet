@@ -4,13 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "styled-components/native";
 
-import { IconBoxProps } from "../ButtonIcon";
-
 import * as Styles from "./styles";
 
 type TopMessageProps = {
   title: string;
-  icon?: IconBoxProps;
+  icon?: IconElement;
 };
 
 const TOP_SPACING_FIXED = 5;

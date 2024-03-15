@@ -1,16 +1,24 @@
-import styled from 'styled-components/native';
+import styled from "styled-components/native";
 
 export const Container = styled.View`
-    background-color: ${({ theme }) => theme.COLORS.GRAY_800};
+  background-color: ${({ theme }) => theme.COLORS.GRAY_800};
 
-    flex: 1;
+  flex: 1;
 `;
 
-
 export const Content = styled.View`
-    padding: 32px;
-    margin-top: 16px;
+  padding: 32px;
+  margin-top: 16px;
 
-    flex: 1;
-    gap: 16px;
+  flex: 1;
+  gap: 16px;
+`;
+
+export const NoLocationMessage = styled.Text`
+  margin: 24px;
+
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  textalign: center;
+
+  color: ${({ theme }) => theme.COLORS.WHITE};
 `;

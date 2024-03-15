@@ -7,29 +7,56 @@ import { TextInput } from "react-native/types";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { Car } from "phosphor-react-native";
+
+import {
+  useForegroundPermissions,
+  watchPositionAsync,
+  LocationAccuracy,
+  LocationSubscription,
+  LocationObjectCoords,
+} from "expo-location";
+
 import { useUser } from "@realm/react";
 
 import { useRealm } from "../../libs/realm";
 import Historic from "../../libs/realm/schemas/Historic";
 
 import { licensePlateValidate } from "../../utils/licensePlateValidate";
+import { getAddressLocation } from "../../utils/getAddressLocation";
 
 import Header from "../../components/Header";
-
 import LicensePlateInput from "../../components/LicensePlateInput";
 import TextAreaInput from "../../components/TextAreaInput";
 import Button from "../../components/Button";
+import Show from "../../components/Show";
+import Loader from "../../components/Loader";
+import LocationInfo from "../../components/LocationInfo";
+import Map from "../../components/Map";
 
 import * as Styles from "./styles";
 
+const LOCATION_UPDATE_INTERVAL = 1000;
+
 const Departure: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoadingLocation, setIsLoadingLocation] =
+    React.useState<boolean>(true);
 
   const [licensePlate, setLicensePlate] = React.useState<string>("");
   const [description, setDescription] = React.useState<string>("");
 
+  const [currentAddress, setCurrentAddress] = React.useState<string | null>(
+    null
+  );
+
+  const [currentCoords, setCurrentCoords] =
+    React.useState<LocationObjectCoords | null>(null);
   const licensePlateRef = React.useRef<TextInput>(null);
   const descriptionRef = React.useRef<TextInput>(null);
+
+  const [locationForegroundPermission, requestLocationForegroundPermission] =
+    useForegroundPermissions();
 
   const { goBack } = useNavigation();
 
@@ -60,6 +87,13 @@ const Departure: React.FC = () => {
         );
       }
 
+      if (!currentCoords?.latitude && !currentCoords?.longitude) {
+        return Alert.alert(
+          "Localização!",
+          "Não foi possível obter a localização atual. Tente novamente!"
+        );
+      }
+
       realm.write(() => {
         realm.create(
           "Historic",
@@ -83,43 +117,95 @@ const Departure: React.FC = () => {
     }
   };
 
+  React.useEffect(() => {
+    requestLocationForegroundPermission();
+  }, []);
+
+  React.useEffect(() => {
+    if (!locationForegroundPermission?.granted) return;
+
+    let locationSubscription: LocationSubscription;
+
+    watchPositionAsync(
+      {
+        accuracy: LocationAccuracy.High,
+        timeInterval: LOCATION_UPDATE_INTERVAL,
+      },
+      ({ coords }) => {
+        getAddressLocation(coords)
+          .then((address) => {
+            if (address) setCurrentAddress(address);
+          })
+          .finally(() => setIsLoadingLocation(false));
+      }
+    ).then((subscription) => (locationSubscription = subscription));
+
+    return () => {
+      locationSubscription?.remove();
+    };
+  }, [locationForegroundPermission]);
+
   return (
-    <Styles.Container>
-      <Header title="Saída" />
+    <Loader loading={isLoadingLocation}>
+      <Styles.Container>
+        <Header title="Saída" />
 
-      <KeyboardAwareScrollView extraHeight={100}>
-        <ScrollView>
-          <Styles.Content>
-            <LicensePlateInput
-              ref={licensePlateRef}
-              label="Placa do veículo"
-              placeholder="BRA1234"
-              onSubmitEditing={handleFieldFocusAfterEditing}
-              returnKeyType="next"
-              onChangeText={setLicensePlate}
-              value={licensePlate}
-            />
+        <Show isShowing={!locationForegroundPermission?.granted}>
+          <Styles.NoLocationMessage>
+            Você precisa que o aplicativo tenha acesso a localização para
+            utilizar essa funcionalidade. Por favor, acesse as configurações do
+            seu dispositivo para conceder essa permissão.
+          </Styles.NoLocationMessage>
+        </Show>
 
-            <TextAreaInput
-              ref={descriptionRef}
-              label="Finalidade"
-              placeholder="Vou utilizar o veículo para..."
-              onSubmitEditing={handleDepartureRegister}
-              returnKeyType="send"
-              onChangeText={setDescription}
-              value={description}
-              blurOnSubmit
-            />
+        <Show isShowing={!!locationForegroundPermission?.granted}>
+          <KeyboardAwareScrollView extraHeight={100}>
+            <ScrollView>
+              <Show isShowing={!!currentCoords}>
+                <Map coordinates={[currentCoords!]} />
+              </Show>
 
-            <Button
-              title="Registrar Saída"
-              onPress={handleDepartureRegister}
-              isLoading={isLoading}
-            />
-          </Styles.Content>
-        </ScrollView>
-      </KeyboardAwareScrollView>
-    </Styles.Container>
+              <Styles.Content>
+                <Show isShowing={!!currentAddress}>
+                  <LocationInfo
+                    icon={Car}
+                    label="Localização atual"
+                    description={currentAddress!}
+                  />
+                </Show>
+
+                <LicensePlateInput
+                  ref={licensePlateRef}
+                  label="Placa do veículo"
+                  placeholder="BRA1234"
+                  onSubmitEditing={handleFieldFocusAfterEditing}
+                  returnKeyType="next"
+                  onChangeText={setLicensePlate}
+                  value={licensePlate}
+                />
+
+                <TextAreaInput
+                  ref={descriptionRef}
+                  label="Finalidade"
+                  placeholder="Vou utilizar o veículo para..."
+                  onSubmitEditing={handleDepartureRegister}
+                  returnKeyType="send"
+                  onChangeText={setDescription}
+                  value={description}
+                  blurOnSubmit
+                />
+
+                <Button
+                  title="Registrar Saída"
+                  onPress={handleDepartureRegister}
+                  isLoading={isLoading}
+                />
+              </Styles.Content>
+            </ScrollView>
+          </KeyboardAwareScrollView>
+        </Show>
+      </Styles.Container>
+    </Loader>
   );
 };
 
