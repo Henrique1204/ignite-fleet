@@ -11,6 +11,8 @@ import { useObject, useRealm } from "../../libs/realm";
 import Historic from "../../libs/realm/schemas/Historic";
 import { getLastSyncTimestamp } from "../../libs/asyncStorage/syncStorage";
 
+import { stopLocationTask } from "../../tasks/backgroundLocationTask";
+
 import Header from "../../components/Header";
 import Button from "../../components/Button";
 import ButtonIcon from "../../components/ButtonIcon";
@@ -47,7 +49,7 @@ const Arrival: React.FC = () => {
     ]);
   };
 
-  const handleArrivalRegister = () => {
+  const handleArrivalRegister = async () => {
     try {
       if (!historic) {
         Alert.alert(
@@ -55,6 +57,8 @@ const Arrival: React.FC = () => {
           "Não foi possível obter os dados para registrar a chega do veículo."
         );
       }
+
+      await stopLocationTask();
 
       realm.write(() => {
         historic!.status = "arrival";
