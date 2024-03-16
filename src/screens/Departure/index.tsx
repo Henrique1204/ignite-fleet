@@ -25,6 +25,7 @@ import Historic from "../../libs/realm/schemas/Historic";
 
 import { licensePlateValidate } from "../../utils/licensePlateValidate";
 import { getAddressLocation } from "../../utils/getAddressLocation";
+import { openSettings } from "../../utils/openSettings";
 
 import { startLocationTask } from "../../tasks/backgroundLocationTask";
 
@@ -102,7 +103,8 @@ const Departure: React.FC = () => {
       if (!backgroundPermissions.granted) {
         return Alert.alert(
           "Localização",
-          'É necessário permitir que o App tenha acesso a localização em segundo plano. Acesse as configuração do dispositivo e habilite "Permitir o tempo todo".'
+          'É necessário permitir que o App tenha acesso a localização em segundo plano. Acesse as configuração do dispositivo e habilite "Permitir o tempo todo".',
+          [{ text: "Abrir configurações", onPress: openSettings }]
         );
       }
 
@@ -115,6 +117,13 @@ const Departure: React.FC = () => {
             description,
             license_plate: licensePlate.toUpperCase(),
             user_id: user.id,
+            coords: [
+              {
+                latitude: currentCoords.latitude,
+                longitude: currentCoords.longitude,
+                timestamp: new Date().getTime(),
+              },
+            ],
           })
         );
       });
@@ -146,6 +155,8 @@ const Departure: React.FC = () => {
         timeInterval: LOCATION_UPDATE_INTERVAL,
       },
       ({ coords }) => {
+        setCurrentCoords(coords);
+
         getAddressLocation(coords)
           .then((address) => {
             if (address) setCurrentAddress(address);
@@ -165,11 +176,15 @@ const Departure: React.FC = () => {
         <Header title="Saída" />
 
         <Show isShowing={!locationForegroundPermission?.granted}>
-          <Styles.NoLocationMessage>
-            Você precisa que o aplicativo tenha acesso a localização para
-            utilizar essa funcionalidade. Por favor, acesse as configurações do
-            seu dispositivo para conceder essa permissão.
-          </Styles.NoLocationMessage>
+          <Styles.MessageContainer>
+            <Styles.NoLocationMessage>
+              Você precisa que o aplicativo tenha acesso a localização para
+              utilizar essa funcionalidade. Por favor, acesse as configurações
+              do seu dispositivo para conceder essa permissão.
+            </Styles.NoLocationMessage>
+
+            <Button title="Abrir configurações" onPress={openSettings} />
+          </Styles.MessageContainer>
         </Show>
 
         <Show isShowing={!!locationForegroundPermission?.granted}>

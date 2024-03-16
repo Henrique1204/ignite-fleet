@@ -14,8 +14,16 @@ export const Content = styled.View`
   gap: 16px;
 `;
 
+export const MessageContainer = styled.View`
+  padding: 24px;
+
+  justify-content: center;
+  flex: 1;
+`;
+
 export const NoLocationMessage = styled.Text`
   margin: 24px;
+  margin-bottom: 44px;
 
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   textalign: center;

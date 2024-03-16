@@ -25,6 +25,6 @@ export const saveStorageLocations = async (newLocation: Location) => {
   await AsyncStorage.setItem(STORAGE_ASYNC_KEY, locationsStorage);
 };
 
-export const deleteStorageLocations = async (newLocation: Location) => {
+export const deleteStorageLocations = async () => {
   await AsyncStorage.removeItem(STORAGE_ASYNC_KEY);
 };
